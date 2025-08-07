@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:mobilenode_app/provider/provider.dart';
+import '../lightnode_screen.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
 
-class EntryScreen extends StatelessWidget {
-  const EntryScreen({super.key});
+class EntryScreen extends StatefulWidget {
+  const EntryScreen({super.key, required this.management});
 
+  final Management management;
+  @override
+  State<EntryScreen> createState() => _EntryScreenState();
+}
+
+class _EntryScreenState extends State<EntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +26,8 @@ class EntryScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  // MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    MaterialPageRoute(builder: (_) => LightNodeScreen(management: widget.management,)),
                 );
               },
             ),

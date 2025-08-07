@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobilenode_app/provider/provider.dart';
 import '../widgets/custom_input.dart';
 import '../services/auth_service.dart';
 import '../lightnode_screen.dart'; // 로그인 성공 후 이동할 화면
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, required this.management});
 
+  final Management management;
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -81,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const LightNodeScreen()),
+      MaterialPageRoute(builder: (_) => LightNodeScreen(management: widget.management,)),
     );
   } else {
     setState(() {
