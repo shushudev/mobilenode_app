@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobilenode_app/provider/provider.dart';
+import 'provider/provider.dart';
 import 'package:provider/provider.dart';
 import 'screens/entry_screen.dart';
 import 'lightnode_bridge.dart'; // LightNodeBridge import 추가
@@ -7,8 +7,6 @@ import 'lightnode_bridge.dart'; // LightNodeBridge import 추가
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Flutter 엔진 초기화
   await LightNodeBridge.initKeys(); // ✅ 키 초기화
-  LightNodeBridge.initListener();   // ✅ MethodChannel listener 등록
-
   runApp(const MyApp());
 }
 
@@ -21,6 +19,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Management management = Management();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

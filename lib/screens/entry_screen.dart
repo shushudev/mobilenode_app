@@ -13,6 +13,7 @@ class EntryScreen extends StatefulWidget {
 }
 
 class _EntryScreenState extends State<EntryScreen> {
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,8 +27,7 @@ class _EntryScreenState extends State<EntryScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  // MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    MaterialPageRoute(builder: (_) => LightNodeScreen(management: widget.management,)),
+                    MaterialPageRoute(builder: (_) => LoginScreen(management: widget.management,)),
                 );
               },
             ),

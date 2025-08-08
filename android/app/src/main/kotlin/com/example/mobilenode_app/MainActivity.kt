@@ -50,10 +50,19 @@ class MainActivity : FlutterActivity() {
 
         // ✅ 콜백 설정 (Java 인터페이스 구현)
         Lightnode.setSignatureRequestCallback(object : SignatureRequestCallback {
-            override fun invoke(hashBase64: String) {
-                println("📢 서명 요청 수신 → Flutter로 전달: $hashBase64")
+    override fun invoke(hashBase64: String) {
+        println("📢 [Kotlin] SignatureRequestCallback 호출됨")
+        println("📢 서명 요청 수신 → Flutter로 전달: $hashBase64")
+
+        runOnUiThread {
+            try {
                 methodChannel.invokeMethod("onSignatureRequest", hashBase64)
+                println("📢 invokeMethod 호출 완료")
+            } catch (e: Exception) {
+                println("❌ invokeMethod 호출 중 오류: ${e.message}")
             }
-        })
+        }
+    }
+})
     }
 }

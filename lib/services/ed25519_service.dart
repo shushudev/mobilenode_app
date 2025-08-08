@@ -10,6 +10,25 @@ import 'dart:typed_data';
 
 final secureStorage = FlutterSecureStorage();
 
+String addPrefixToPubKey(Uint8List pubKey32) {
+  // 1바이트 prefix (예: 0xED)
+  const int prefix = 0xED;
+
+  // 33바이트 버퍼 생성
+  final prefixedKey = Uint8List(pubKey32.length + 1);
+
+  // prefix 추가
+  prefixedKey[0] = prefix;
+
+  // 기존 32바이트 키 복사
+  for (int i = 0; i < pubKey32.length; i++) {
+    prefixedKey[i + 1] = pubKey32[i];
+  }
+
+  // Base64 인코딩해서 리턴
+  return base64.encode(prefixedKey);
+}
+
 Future<void> generateAndStoreKeys({
   required String nodeId,
   required String deviceId,
@@ -45,7 +64,7 @@ Future<void> generateAndStoreKeys({
     'node_id': nodeId,
     'device_id': deviceId,
     'password': password,
-    'public_key': pubKeyBase64,
+    'public_key': publicKey,
     'address': cosmosAddress, // ← 추가된 부분
   });
 

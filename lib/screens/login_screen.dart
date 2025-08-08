@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobilenode_app/provider/provider.dart';
 import '../widgets/custom_input.dart';
 import '../services/auth_service.dart';
+import '../lightnode_bridge.dart';
 import '../lightnode_screen.dart'; // 로그인 성공 후 이동할 화면
 
 class LoginScreen extends StatefulWidget {
@@ -65,7 +66,13 @@ class _LoginScreenState extends State<LoginScreen> {
         'nodeId': nodeId,
         'password': password,
       });
+      await LightNodeBridge.initKeys(); // 키 다시 초기화
+      LightNodeBridge.initListener();  
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("로그인 성공 및 키 초기화 완료")),
+    );
       print("✅ LightNode 실행 요청 성공");
+      
     } catch (e) {
       print("❌ LightNode 실행 요청 실패: $e");
       ScaffoldMessenger.of(context).showSnackBar(
