@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 /// 서버 URL
-const String baseUrl = 'http://192.168.0.132:3001';
+const String baseUrl = 'http://192.168.0.131:3001';
 
 /// 로그인 검증
 Future<bool> verifyCredentials({

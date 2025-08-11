@@ -70,7 +70,7 @@ Future<void> generateAndStoreKeys({
 
 
   final res = await http.post(
-    Uri.parse('http://192.168.0.132:3001/connect'),
+    Uri.parse('http://192.168.0.131:3001/connect'),
     headers: {'Content-Type': 'application/json'},
     body: body,
   );

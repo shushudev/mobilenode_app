@@ -6,25 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
-String addPrefixToPubKey(Uint8List pubKey32) {
-  // 1바이트 prefix (예: 0xED)
-  const int prefix = 0xED;
-
-  // 33바이트 버퍼 생성
-  final prefixedKey = Uint8List(pubKey32.length + 1);
-
-  // prefix 추가
-  prefixedKey[0] = prefix;
-
-  // 기존 32바이트 키 복사
-  for (int i = 0; i < pubKey32.length; i++) {
-    prefixedKey[i + 1] = pubKey32[i];
-  }
-
-  // Base64 인코딩해서 리턴
-  return base64.encode(prefixedKey);
-}
-
 /// 📦 Isolate에서 사용할 Top-Level 함수 (compute로 호출됨)
 Future<String> _signInIsolate(Map<String, dynamic> params) async {
   final Uint8List privateKeyBytes = params['privateKeyBytes'];
@@ -98,17 +79,14 @@ class LightNodeBridge {
         print("📥 서명 요청 수신 (onSignatureRequest): $hashBase64");
 
 
-        final pubKey32 = _publicKey.bytes;
-        Uint8List pubKeyUint8List = Uint8List.fromList(pubKey32);
-        final pubKeyBase64WithPrefix = addPrefixToPubKey(Uint8List.fromList(pubKey32));
-      
+        
         try {
           final hashBytes = base64Decode(hashBase64);
           final signatureBytes = ed.sign(_privateKey, hashBytes);
           final signatureBase64 = base64Encode(signatureBytes);
           final pubKeyBase64 = base64Encode(_publicKey.bytes);
 
-          final result = await sendSignature(signatureBase64, pubKeyBase64WithPrefix, hashBase64);
+          final result = await sendSignature(signatureBase64, pubKeyBase64, hashBase64);
           print("✅ sendSignature 결과: $result");
 
           return result;
