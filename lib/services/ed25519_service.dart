@@ -64,7 +64,7 @@ Future<void> generateAndStoreKeys({
     'node_id': nodeId,
     'device_id': deviceId,
     'password': password,
-    'public_key': publicKey,
+    'public_key': pubKeyBase64,
     'address': cosmosAddress, // ← 추가된 부분
   });
 
