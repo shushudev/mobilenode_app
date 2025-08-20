@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobilenode_app/provider/provider.dart';
 import 'package:provider/provider.dart';
 import 'lightnode_bridge.dart';
-import 'package:mobilenode_app/screens/balance_screen.dart';
+import 'screens/balance_screen.dart';
 
 
 class LightNodeScreen extends StatefulWidget {
