@@ -21,7 +21,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
   @override
   void initState() {
     super.initState();
-    channel = WebSocketChannel.connect(Uri.parse('ws://localhost:8080'));
+    channel = WebSocketChannel.connect(Uri.parse('ws://192.168.131:8080'));
     channel.stream.listen((message) async {
       final data = json.decode(message);
       final msgAddress = data['address'] as String;
