@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobilenode_app/provider/provider.dart';
+import 'package:provider/provider.dart';
 import 'lightnode_bridge.dart';
+import 'package:mobilenode_app/screens/balance_screen.dart';
+
 
 class LightNodeScreen extends StatefulWidget {
   const LightNodeScreen({super.key, required this.management});
@@ -33,10 +36,14 @@ class _LightNodeScreenState extends State<LightNodeScreen> {
             },
             child: Text('Start LightNode'),
           ),
-          SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () async {
-
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BalanceScreen(management: widget.management),
+                ),
+              );
             },
             child: Text('Balance'),
           ),

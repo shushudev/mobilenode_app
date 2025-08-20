@@ -55,6 +55,8 @@ Future<void> generateAndStoreKeys({
   // 4. 키 저장 (Base64)
   await secureStorage.write(key: 'private_key', value: privKeyBase64);
   await secureStorage.write(key: 'public_key', value: pubKeyBase64);
+  // 4-1 address 저장(계좌 mapping을 위한)
+  await secureStorage.write(key: 'cosmos_address', value: cosmosAddress);
 
   print("✅ Public Key 저장: $pubKeyBase64");
   print("✅ Cosmos 주소: $cosmosAddress");
