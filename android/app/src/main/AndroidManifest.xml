@@ -28,9 +28,10 @@
             </intent-filter>
         </activity>
         <service
-        android:name="id.flutter.background_service.BackgroundService"
+        android:name="id.flutter.flutter_background_service.BackgroundService"
         android:exported="false"
-        android:foregroundServiceType="location|dataSync|connectedDevice"/>
+        android:foregroundServiceType="location|dataSync" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
