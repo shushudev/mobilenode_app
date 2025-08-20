@@ -35,9 +35,15 @@ Future<void> initializeService() async {
 
   service.startService();
 }
-
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
+  if (service is AndroidServiceInstance) {
+    service.setForegroundNotificationInfo(
+      title: "LightNode Service",
+      content: "Running in background",
+    );
+  }
+
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
@@ -45,7 +51,6 @@ void onStart(ServiceInstance service) async {
   while (true) {
     await Future.delayed(const Duration(seconds: 10));
     debugPrint("[BackgroundService] running...");
-    // LightNodeBridge.ping() 같은 유지 로직 추가 가능
   }
 }
 
