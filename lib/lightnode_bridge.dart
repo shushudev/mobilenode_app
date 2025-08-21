@@ -39,7 +39,7 @@ class LightNodeBridge {
 static Future<void> initKeys() async {
   final privateKeyBase64 = await _storage.read(key: 'privateKey');
   final publicKeyBase64 = await _storage.read(key: 'publicKey');
-  final cosmosAddressStored = await _storage.read(key: 'cosmosAddress');
+  final cosmosAddressStored = await _storage.read(key: 'cosmos_address');
 
   if (privateKeyBase64 != null && publicKeyBase64 != null && cosmosAddressStored != null) {
     _privateKey = ed.PrivateKey(Uint8List.fromList(base64Decode(privateKeyBase64)));
