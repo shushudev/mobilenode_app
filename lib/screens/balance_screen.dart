@@ -23,30 +23,37 @@ class _BalanceScreenState extends State<BalanceScreen> {
   }
 
   Future<void> _loadMyAddress() async {
-    // Secure Storage에서 자기 주소 가져오기
-    final storedAddress = await storage.read(key: 'cosmosAddress');
-    if (storedAddress != null) {
-      myAddress = storedAddress;
+  // Secure Storage에서 자기 주소 가져오기
+  final storedAddress = await storage.read(key: 'cosmosAddress');
+  if (storedAddress != null) {
+    myAddress = storedAddress;
+    print("✅ 내 주소 로드 완료: $myAddress");
 
-      // EventChannel 구독 시작
-      balanceChannel.receiveBroadcastStream().listen((event) {
-        try {
-          final data = json.decode(event as String);
+    // EventChannel 구독 시작
+    balanceChannel.receiveBroadcastStream().listen((event) {
+      print("📩 EventChannel에서 데이터 수신: $event");
 
-          // 자기 주소와 일치할 때만 balance 업데이트
-          if (data['address'] == myAddress) {
-            setState(() {
-              balance = data['balance'];
-            });
-          }
-        } catch (e) {
-          print("❌ Balance parsing error: $e");
+      try {
+        final data = json.decode(event as String);
+        print("📊 파싱된 데이터: $data");
+
+        // 자기 주소와 일치할 때만 balance 업데이트
+        if (data['address'] == myAddress) {
+          print("💰 주소 일치! balance 업데이트: ${data['balance']}");
+          setState(() {
+            balance = data['balance'];
+          });
+        } else {
+          print("⚠️ 주소 불일치: event 주소=${data['address']}");
         }
-      });
-    } else {
-      print("❌ SecureStorage에서 주소를 읽을 수 없음");
-    }
+      } catch (e, stacktrace) {
+        print("❌ Balance parsing error: $e\n$stacktrace");
+      }
+    });
+  } else {
+    print("❌ SecureStorage에서 주소를 읽을 수 없음");
   }
+}
 
   @override
   Widget build(BuildContext context) {
