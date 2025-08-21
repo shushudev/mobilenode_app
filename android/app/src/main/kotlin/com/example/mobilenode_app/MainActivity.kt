@@ -7,11 +7,10 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.EventChannel
 
-
-
-class MainActivity : FlutterActivity() {s
+class MainActivity : FlutterActivity() {
     private val CHANNEL = "lightnode"
     private val BALANCE_CHANNEL = "com.mobilenode/balance"
+
     private lateinit var methodChannel: MethodChannel
     private var balanceEventSink: EventChannel.EventSink? = null
 
@@ -62,6 +61,7 @@ class MainActivity : FlutterActivity() {s
                 "sendBalance" -> {
                     val brokers = call.argument<String>("brokers") ?: "[]"
                     val topic = call.argument<String>("topic") ?: "balance-topic"
+                    
                     Lightnode.sendBalance(brokers, topic)
                     result.success("Balance listener started")
                 }
