@@ -87,10 +87,9 @@ class MainActivity : FlutterActivity() {
     }
 })
 
-        Lightnode.setBalanceCallback { balanceJson ->
-            runOnUiThread {
-                balanceEventSink?.success(balanceJson)
-            }
+        Lightnode.setBalanceCallback { balanceJson: String ->
+        runOnUiThread {
+            balanceEventSink?.success(balanceJson)
         }
-    }
+    }   
 }
