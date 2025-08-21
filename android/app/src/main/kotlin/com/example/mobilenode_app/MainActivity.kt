@@ -6,6 +6,8 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.EventChannel
+import com.example.lightnode.lightnode.BalanceCallback
+
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "lightnode"
@@ -86,6 +88,17 @@ class MainActivity : FlutterActivity() {
         }
     }
 })
+    // ✅ Balance 콜백 등록
+    Lightnode.setBalanceCallback(object : BalanceCallback {
+        override fun invoke(balanceJson: String) {
+            println("📢 [Kotlin] BalanceCallback 호출됨 → $balanceJson")
+
+            runOnUiThread {
+                balanceEventSink?.success(balanceJson)
+            }
+        }
+    })
+
 
     }
 }
