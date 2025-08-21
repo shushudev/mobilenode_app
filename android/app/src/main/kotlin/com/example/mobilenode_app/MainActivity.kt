@@ -86,14 +86,6 @@ class MainActivity : FlutterActivity() {
         }
     }
 })
-       Lightnode.setBalanceCallback(object : Lightnode.BalanceCallback {
-        override fun onBalance(balance: String) {
-        runOnUiThread {
-            balanceEventSink?.success(balance)
-        }
-    }
-})
-
 
     }
 }
