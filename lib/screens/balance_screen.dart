@@ -24,7 +24,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
 
   Future<void> _loadMyAddress() async {
     // Secure Storage에서 자기 주소 가져오기
-    final storedAddress = await storage.read(key: 'cosmos_address');
+    final storedAddress = await storage.read(key: 'cosmosAddress');
     if (storedAddress != null) {
       myAddress = storedAddress;
 
