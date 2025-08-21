@@ -9,12 +9,25 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "lightnode"
+    private val BALANCE_CHANNEL = "com.mobilenode/balance"
     private lateinit var methodChannel: MethodChannel
+    private var balanceEventSink: EventChannel.EventSink? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+        
+         // EventChannel 설정
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, BALANCE_CHANNEL)
+            .setStreamHandler(object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    balanceEventSink = events
+                }
+                override fun onCancel(arguments: Any?) {
+                    balanceEventSink = null
+                }
+            })
 
         methodChannel.setMethodCallHandler { call, result ->
             when (call.method) {
@@ -44,13 +57,20 @@ class MainActivity : FlutterActivity() {
                     val res = Lightnode.sendSignature(signature, publicKey, hash)
                     result.success(res)
                 }
+                "sendBalance" -> {
+                    val brokers = call.argument<String>("brokers") ?: "[]"
+                    val topic = call.argument<String>("topic") ?: "balance-topic"
+                    Lightnode.sendBalance(brokers, topic)
+                    result.success("Balance listener started")
+                }
                 else -> result.notImplemented()
             }
         }
 
         // ✅ 콜백 설정 (Java 인터페이스 구현)
         Lightnode.setSignatureRequestCallback(object : SignatureRequestCallback {
-    override fun invoke(hashBase64: String) {
+        override fun invoke(hashBase64: String) {
+        
         println("📢 [Kotlin] SignatureRequestCallback 호출됨")
         println("📢 서명 요청 수신 → Flutter로 전달: $hashBase64")
 
@@ -64,5 +84,12 @@ class MainActivity : FlutterActivity() {
         }
     }
 })
+
+      // Balance 콜백 설정
+        Lightnode.setBalanceCallback { jsonStr ->
+            runOnUiThread {
+                balanceEventSink?.success(jsonStr)
+            }
+        }
     }
 }
