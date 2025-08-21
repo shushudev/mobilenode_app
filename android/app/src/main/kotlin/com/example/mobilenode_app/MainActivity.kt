@@ -87,10 +87,9 @@ class MainActivity : FlutterActivity() {
     }
 })
 
-      // Balance 콜백 설정
-        Lightnode.setBalanceCallback { jsonStr ->
+        Lightnode.setBalanceCallback { balanceJson ->
             runOnUiThread {
-                balanceEventSink?.success(jsonStr)
+                balanceEventSink?.success(balanceJson)
             }
         }
     }
