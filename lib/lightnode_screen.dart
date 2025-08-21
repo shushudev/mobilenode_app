@@ -41,7 +41,7 @@ class _LightNodeScreenState extends State<LightNodeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BalanceScreen(management: widget.management),
+                  builder: (context) => BalanceScreen(),
                 ),
               );
             },
