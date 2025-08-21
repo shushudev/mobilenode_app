@@ -5,9 +5,11 @@ import com.example.lightnode.lightnode.SignatureRequestCallback
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.EventChannel
 
 
-class MainActivity : FlutterActivity() {
+
+class MainActivity : FlutterActivity() {s
     private val CHANNEL = "lightnode"
     private val BALANCE_CHANNEL = "com.mobilenode/balance"
     private lateinit var methodChannel: MethodChannel
