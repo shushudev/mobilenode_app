@@ -2,9 +2,16 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:async';
-import 'package:flutter/foundation.dart';  
+import 'package:flutter/foundation.dart';
+import 'package:pointycastle/digests/ripemd160.dart';  
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
+import 'package:crypto/crypto.dart' as crypto;
+import 'package:bech32/bech32.dart';
+
+
+
+/// 8비트 → 5비트 변환 (Bech32용)
 
 /// 📦 Isolate에서 사용할 Top-Level 함수 (compute로 호출됨)
 Future<String> _signInIsolate(Map<String, dynamic> params) async {
@@ -19,6 +26,7 @@ Future<String> _signInIsolate(Map<String, dynamic> params) async {
 
 /// 📡 LightNodeBridge 클래스
 class LightNodeBridge {
+  
   static const MethodChannel _channel = MethodChannel('lightnode');
   static const _storage = FlutterSecureStorage();
 
@@ -39,7 +47,24 @@ static Future<void> initKeys() async {
     _cosmosAddress = cosmosAddressStored;
     print("✅ 기존 키와 주소 로드 완료: $_cosmosAddress");
   } else {
-    print("❌ 공개키 또는 주소가 없습니다.");
+    // 새 키 생성
+    final keyPair = ed.generateKey();
+    _privateKey = keyPair.privateKey;
+    _publicKey = keyPair.publicKey;
+
+    // Cosmos 주소 생성 (SHA256 → RIPEMD160 → Bech32)
+    final sha256Digest = crypto.sha256.convert(_publicKey.bytes);
+    final ripemd = RIPEMD160Digest();
+    final ripemdDigest = ripemd.process(Uint8List.fromList(sha256Digest.bytes));
+    final fiveBit = convertBits(ripemdDigest, 8, 5, true);
+    _cosmosAddress = bech32.encode(Bech32('cosmos', fiveBit));
+
+    // 저장
+    await _storage.write(key: 'privateKey', value: base64Encode(_privateKey.bytes));
+    await _storage.write(key: 'publicKey', value: base64Encode(_publicKey.bytes));
+    await _storage.write(key: 'cosmosAddress', value: _cosmosAddress);
+
+    print("🔑 새 키와 주소 생성 완료: $_cosmosAddress");
   }
 }
 
@@ -116,6 +141,36 @@ static Future<void> initKeys() async {
       return null;
     }
   }
+
+/// 8비트 → 5비트 변환 (Bech32용)
+static List<int> convertBits(List<int> data, int from, int to, bool pad) {
+  int acc = 0;
+  int bits = 0;
+  List<int> ret = [];
+  final maxv = (1 << to) - 1;
+
+  for (final value in data) {
+    if (value < 0 || (value >> from) != 0) {
+      throw FormatException("Invalid value: $value");
+    }
+    acc = (acc << from) | value;
+    bits += from;
+    while (bits >= to) {
+      bits -= to;
+      ret.add((acc >> bits) & maxv);
+    }
+  }
+
+  if (pad) {
+    if (bits > 0) {
+      ret.add((acc << (to - bits)) & maxv);
+    }
+  } else if (bits >= from || ((acc << (to - bits)) & maxv) != 0) {
+    throw FormatException("Conversion error");
+  }
+
+  return ret;
+}
 
   /// 🚀 라이트 노드 시작
   static Future<String?> startLightNode() async {
