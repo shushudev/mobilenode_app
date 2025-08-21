@@ -24,27 +24,25 @@ class LightNodeBridge {
 
   static late ed.PrivateKey _privateKey;
   static late ed.PublicKey _publicKey;
+  static late String _cosmosAddress;
 
   /// 🔑 키 초기화 (저장된 키가 없으면 새로 생성)
-  static Future<void> initKeys() async {
-    final privateKeyBase64 = await _storage.read(key: 'privateKey');
-    final publicKeyBase64 = await _storage.read(key: 'publicKey');
+  /// 🔑 키 초기화 (저장된 키가 없으면 새로 생성)
+static Future<void> initKeys() async {
+  final privateKeyBase64 = await _storage.read(key: 'privateKey');
+  final publicKeyBase64 = await _storage.read(key: 'publicKey');
+  final cosmosAddressStored = await _storage.read(key: 'cosmosAddress');
 
-    if (privateKeyBase64 != null && publicKeyBase64 != null) {
-      _privateKey = ed.PrivateKey(Uint8List.fromList(base64Decode(privateKeyBase64)));
-      _publicKey = ed.PublicKey(Uint8List.fromList(base64Decode(publicKeyBase64)));
-      print("✅ 기존 키 로드 완료");
-    } else {
-      final keyPair = ed.generateKey();
-      _privateKey = keyPair.privateKey;
-      _publicKey = keyPair.publicKey;
-
-      await _storage.write(key: 'privateKey', value: base64Encode(_privateKey.bytes));
-      await _storage.write(key: 'publicKey', value: base64Encode(_publicKey.bytes));
-      print("🔑 새 키 생성 및 저장 완료");
-      print("✅ _privateKey: $_privateKey");
-    }
+  if (privateKeyBase64 != null && publicKeyBase64 != null && cosmosAddressStored != null) {
+    _privateKey = ed.PrivateKey(Uint8List.fromList(base64Decode(privateKeyBase64)));
+    _publicKey = ed.PublicKey(Uint8List.fromList(base64Decode(publicKeyBase64)));
+    _cosmosAddress = cosmosAddressStored;
+    print("✅ 기존 키와 주소 로드 완료: $_cosmosAddress");
+  } else {
+    print("❌ 공개키 또는 주소가 없습니다.");
   }
+}
+
 
   /// 🧠 Isolate를 활용한 서명 함수
   static Future<String> signPayload(String payload) async {

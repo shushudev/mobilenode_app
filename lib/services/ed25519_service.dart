@@ -135,3 +135,17 @@ List<int> convertBits(List<int> data, int from, int to, bool pad) {
 
   return ret;
 }
+Future<Map<String, String>?> loadPublicKeyAndAddress() async {
+  final pubKeyBase64 = await secureStorage.read(key: 'public_key');
+  final cosmosAddress = await secureStorage.read(key: 'cosmos_address');
+
+  if (pubKeyBase64 != null && cosmosAddress != null) {
+    return {
+      'publicKey': pubKeyBase64,
+      'address': cosmosAddress,
+    };
+  } else {
+    // 아직 가입하지 않았거나 저장 안 된 경우
+    return null;
+  }
+}

@@ -5,6 +5,7 @@ import '../widgets/custom_input.dart';
 import '../services/auth_service.dart';
 import '../lightnode_bridge.dart';
 import '../lightnode_screen.dart'; // 로그인 성공 후 이동할 화면
+import 'balance_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.management});
@@ -66,6 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
         'nodeId': nodeId,
         'password': password,
       });
+
+      // 로그인 시 publicKey와 address만 로드
+      await loadPublicKeyAndAddress();
+
       await LightNodeBridge.initKeys(); // 키 다시 초기화
       LightNodeBridge.initListener();  
       ScaffoldMessenger.of(context).showSnackBar(
