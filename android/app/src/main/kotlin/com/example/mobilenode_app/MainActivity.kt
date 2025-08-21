@@ -90,7 +90,7 @@ class MainActivity : FlutterActivity() {
 })
     // ✅ Balance 콜백 등록
     Lightnode.setBalanceCallback(object : BalanceCallback {
-        override fun invoke(balanceJson: String) {
+        override fun onBalance(balanceJson: String) {
             println("📢 [Kotlin] BalanceCallback 호출됨 → $balanceJson")
 
             runOnUiThread {
@@ -98,7 +98,5 @@ class MainActivity : FlutterActivity() {
             }
         }
     })
-
-
     }
 }
