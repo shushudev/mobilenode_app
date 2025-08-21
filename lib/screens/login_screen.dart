@@ -67,10 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
         'nodeId': nodeId,
         'password': password,
       });
-
-      // 로그인 시 publicKey와 address만 로드
-      await loadPublicKeyAndAddress();
-
+      
       await LightNodeBridge.initKeys(); // 키 다시 초기화
       LightNodeBridge.initListener();  
       ScaffoldMessenger.of(context).showSnackBar(
