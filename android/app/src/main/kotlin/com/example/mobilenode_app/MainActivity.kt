@@ -2,14 +2,14 @@ package com.example.mobilenode_app
 
 import com.example.lightnode.lightnode.Lightnode
 import com.example.lightnode.lightnode.SignatureRequestCallback
+import com.example.lightnode.lightnode.BalanceCallback
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.EventChannel
-import com.example.lightnode.lightnode.BalanceCallback
-
 
 class MainActivity : FlutterActivity() {
+
     private val CHANNEL = "lightnode"
     private val BALANCE_CHANNEL = "com.mobilenode/balance"
 
@@ -19,19 +19,23 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
+        // MethodChannel (Flutter → Kotlin → Go 호출)
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
-        
-         // EventChannel 설정
+
+        // EventChannel (Go → Kotlin → Flutter 스트림 전달: balance)
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, BALANCE_CHANNEL)
             .setStreamHandler(object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                     balanceEventSink = events
+                    println("✅ Balance EventChannel listener 등록됨")
                 }
                 override fun onCancel(arguments: Any?) {
                     balanceEventSink = null
+                    println("⚠️ Balance EventChannel listener 해제됨")
                 }
             })
 
+        // MethodChannel 핸들러
         methodChannel.setMethodCallHandler { call, result ->
             when (call.method) {
                 "startLightNode" -> {
@@ -63,7 +67,6 @@ class MainActivity : FlutterActivity() {
                 "sendBalance" -> {
                     val brokers = call.argument<String>("brokers") ?: "[]"
                     val topic = call.argument<String>("topic") ?: "balance-topic"
-                    
                     Lightnode.sendBalance(brokers, topic)
                     result.success("Balance listener started")
                 }
@@ -71,32 +74,33 @@ class MainActivity : FlutterActivity() {
             }
         }
 
-        // ✅ 콜백 설정 (Java 인터페이스 구현)
+        // Go → Kotlin 콜백 등록
+
+        // ✅ Signature 요청 콜백
         Lightnode.setSignatureRequestCallback(object : SignatureRequestCallback {
-        override fun invoke(hashBase64: String) {
-        
-        println("📢 [Kotlin] SignatureRequestCallback 호출됨")
-        println("📢 서명 요청 수신 → Flutter로 전달: $hashBase64")
-
-        runOnUiThread {
-            try {
-                methodChannel.invokeMethod("onSignatureRequest", hashBase64)
-                println("📢 invokeMethod 호출 완료")
-            } catch (e: Exception) {
-                println("❌ invokeMethod 호출 중 오류: ${e.message}")
+            override fun invoke(hashBase64: String) {
+                println("📢 [Kotlin] SignatureRequestCallback 호출됨 → $hashBase64")
+                runOnUiThread {
+                    try {
+                        methodChannel.invokeMethod("onSignatureRequest", hashBase64)
+                        println("📢 Flutter로 onSignatureRequest 전달 완료")
+                    } catch (e: Exception) {
+                        println("❌ Flutter invokeMethod 오류: ${e.message}")
+                    }
+                }
             }
-        }
-    }
-})
-    // ✅ Balance 콜백 등록
-    Lightnode.setBalanceCallback(object : BalanceCallback {
-        override fun onBalance(balanceJson: String) {
-            println("📢 [Kotlin] BalanceCallback 호출됨 → $balanceJson")
+        })
+        println("✅ SignatureRequestCallback 등록 완료")
 
-            runOnUiThread {
-                balanceEventSink?.success(balanceJson)
+        // ✅ Balance 콜백
+        Lightnode.setBalanceCallback(object : BalanceCallback {
+            override fun onBalance(balanceJson: String) {
+                println("📢 [Kotlin] BalanceCallback 호출됨 → $balanceJson")
+                runOnUiThread {
+                    balanceEventSink?.success(balanceJson)
+                }
             }
-        }
-    })
+        })
+        println("✅ BalanceCallback 등록 완료")
     }
 }
